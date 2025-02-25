@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// to sync schema and table we ren migration command --->   npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id       Int     @id @default(autoincrement()) // @id means works as primary key  
+  email    String  @unique
+  name     String? //? means  optional
+  password String
+  otp      String?
+  verified Boolean @default(false)
+  blogs    Blog[]
+  likes    Like[]
+}
+
+///relation is done in which foriegn key is present
+model Blog {
+  id          Int    @id @default(autoincrement()) // @id means works as primary key  
+  Title       String
+  Description String
+  author      user   @relation(fields: [authorId], references: [id])
+  authorId    Int //foriegn key
+  likes       Like[]
+  likecount   Int    @default(0)
+}
+
+model Like {
+  id       Int  @id @default(autoincrement())
+  authorId Int
+  blogId   Int
+  user     user @relation(fields: [authorId], references: [id])
+  blog     Blog @relation(fields: [blogId], references: [id])
+}
+
+model Token{
+  id Int @id @default(autoincrement())
+  token Int
+  userId Int
+}
