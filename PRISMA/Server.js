@@ -1,43 +1,70 @@
-const express=require("express");
-const app=express();
-const { PrismaClient } = require('@prisma/client');
-
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// console.log(require("./routes/Blogroutes"))
-app.use(express.json());
-// app.get("/api/blog/:id",(req,res)=>{
-//     let {id} = req.params;
-//     res.send(id)
-// })
-app.use("/api/user",require("./routes/userroutes"))
-app.use("/api/blog",require("./routes/Blogroutes"))
-app.use("/api/auth",require("./routes/auth"))
-app.use("/api/likes",require("./routes/likeroute"))
+const app = express();
+const PORT = process.env.PORT || 4545; // Use environment variable for port
 
-app.get("/verify/:token/:userid",async (req,res)=>{
-    let {token,userid} = req.params;
-    let isToken = await prisma.token.findFirst({
-        where:{
-            token:parseInt(token),
-            userId:parseInt(userid)
-        }
-    })
-    if(!isToken) return res.send("invalid ")
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse JSON bodies
+app.use(morgan("dev")); // Log incoming requests
 
-    else{
-        let updateuserEmail=await prisma.user.update({
-            where:{
-                id:parseInt(userid)
-            },
-            data:{
-                isverify:true
-            }
-        })
-        res.send("email verified please login to continue");
+// Routes
+app.use("/api/user", require("./routes/userroutes"));
+app.use("/api/blog", require("./routes/Blogroutes"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/likes", require("./routes/likeroute"));
+
+app.use("/api/subscription", require("./routes/subscriptionRoutes"));
+// Health check route
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Server is running" });
+});
+
+// Email verification route
+app.get("/verify/:token/:userid", async (req, res) => {
+  const { token, userid } = req.params;
+
+  try {
+    // Check if the token exists
+    const isToken = await prisma.token.findFirst({
+      where: {
+        token: parseInt(token),
+        userId: parseInt(userid),
+      },
+    });
+
+    if (!isToken) {
+      return res.status(400).send("Invalid token or user ID");
     }
 
-})
-app.listen(4545,()=>{
-    console.log("server started");
-})
+    // Update user's verification status
+    const updateUserEmail = await prisma.user.update({
+      where: {
+        id: parseInt(userid),
+      },
+      data: {
+        verified: true, // Ensure this field exists in your Prisma schema
+      },
+    });
+
+    res.send("Email verified. Please login to continue.");
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server started on http://localhost:${PORT}`);
+});

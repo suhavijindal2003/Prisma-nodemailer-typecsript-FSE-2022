@@ -3,7 +3,7 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-// to sync schema and table we ren migration command --->   npx prisma migrate dev --name init
+// to sync schema and table we run migration command --->   npx prisma migrate dev --name init
 
 generator client {
   provider = "prisma-client-js"
@@ -14,38 +14,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id       Int     @id @default(autoincrement()) // @id means works as primary key  
-  email    String  @unique
-  name     String? //? means  optional
-  password String
-  otp      String?
-  verified Boolean @default(false)
-  blogs    Blog[]
-  likes    Like[]
+model User {
+  id           Int            @id @default(autoincrement()) // @id means works as primary key  
+  email        String         @unique
+  name         String? //? means optional
+  password     String
+  otp          String?
+  verified     Boolean        @default(false)
+  Role      String @default("USER")
+  blogs        Blog[]
+  likes        Like[]
+  tokens       Token[]
+  Subscription Subscription[]
 }
 
-///relation is done in which foriegn key is present
+///relation is done in which foreign key is present
 model Blog {
   id          Int    @id @default(autoincrement()) // @id means works as primary key  
   Title       String
   Description String
-  author      user   @relation(fields: [authorId], references: [id])
-  authorId    Int //foriegn key
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    Int // foreign key
   likes       Like[]
   likecount   Int    @default(0)
+  status      String @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
 }
 
 model Like {
   id       Int  @id @default(autoincrement())
   authorId Int
   blogId   Int
-  user     user @relation(fields: [authorId], references: [id])
+  user     User @relation(fields: [authorId], references: [id])
   blog     Blog @relation(fields: [blogId], references: [id])
 }
 
-model Token{
-  id Int @id @default(autoincrement())
-  token Int
+model Token {
+  id     Int  @id @default(autoincrement())
+  token  Int
   userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int // Foreign key to User
+  user      User     @relation(fields: [userId], references: [id])
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, CANCELLED
+  plan      String // e.g., MONTHLY, YEARLY
+  price     Float // Subscription fee
 }

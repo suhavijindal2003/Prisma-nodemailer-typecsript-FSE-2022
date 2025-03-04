@@ -18,8 +18,8 @@ async function main() {
         from: 'suhavi.jindal03@gmail.com', // sender address
         to: email, // list of receivers
         subject: subject, // Subject line
-        text: "please click the link to verify your email", // plain text body
-        html: `<a href=${message}>Link</a>`, // html body
+        text: message, // Plain text body
+        html: `<p>${message}</p>`, // HTML body
     });
 
     console.log("Message sent: %s", info.messageId);
