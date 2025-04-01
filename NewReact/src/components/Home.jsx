@@ -2,9 +2,12 @@ import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link ,useNavigate } from 'react-router-dom';
 
-const main = () => {
+const Home = () => {
   let navigate = useNavigate();
-
+  
+  function ClickHandler() {
+    navigate('/userlist');
+  }
   function btnClickHandler() {
     navigate('/contact');
   }
@@ -25,8 +28,10 @@ const main = () => {
       </li>
     </ul>
     <button onClick={btnClickHandler}>Submit</button>
+    <button onClick={ClickHandler}>Userlist</button>
+
   </div>
   )
 }
 
-export default main
+export default Home;

@@ -11,7 +11,7 @@
 //         setUsers(userdata);
 //     }
 //     fetchusers("https://jsonplaceholder.typicode.com/users");	
-  
+
 //   },[])
 
 //   return (
@@ -116,14 +116,14 @@
 //   console.log("child1");
 //   return(
 //     <div>child1</div>
-    
+
 //   )
 // })
 // let Child2=memo(function Child2(){
 //   console.log("child2");
 //   return(
 //     <div>child2</div>
-    
+
 //   )
 // })
 // let Child3=memo(function Child3(){
@@ -136,25 +136,37 @@
 // export default App
 
 import React from 'react';
-import Main from './components/main.jsx';
+
 import About from './components/About.jsx';
 import Contact from './components/Contact.jsx';
 import Profile from './components/Profile.jsx';
-import { BrowserRouter as Browserroutes, Routes, Route } from 'react-router-dom';
+import User from './components/User.jsx';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import UserList from './components/UserList.jsx';
+// import { useNavigate } from 'react-router-dom';
+import Home from './components/Home.jsx';
 const App = () => {
+  
+ 
   return (
     <>
-      {/* <Main /> */}
-      <Browserroutes>
+     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path='/:username' element={<Profile/>} />
+        <Route path='/:username' element={<Profile />} />
+        <Route path="/userlist" element={<UserList />}>
+          <Route path=":id" element={<User />} />
+        </Route>
       </Routes>
-      </Browserroutes>
-    </>
-  );
-}
+      
+      </BrowserRouter>
 
+      
+    </>
+   
+  );
+ 
+}
 export default App;

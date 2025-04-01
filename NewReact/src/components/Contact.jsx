@@ -1,10 +1,11 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Main from './main.jsx';
+import Home from './Home';
+
 const Contact = () => {
   return (
     <div>
-        <Main></Main>
+       <Home></Home>
         <h1>Contact</h1>
         <div className="container d-flex justify-content-center align-items-center bg-light">   
         <div className="card shadow-lg p-4 justify-content-center align-items-center" >
